@@ -1,0 +1,107 @@
+Model::Model() : dt(0.5), m(1.0), totTime(0)
+{
+  static const float c_drag[2] = [0.12, 0.34]; // Table of Drag constants
+  static float* u_air[3]; // Velocity of surrounding air
+  static float* u_sc_cur[3]; // Current velocity of spacecraft
+  static float* u_sc_req[3]; // Requested velocity of spacecraft
+  static float* a_sc_cur[3]; // Current acceleration of spacecraft
+  static float* a_sc_req[3]; // Requested acceleration of spacecraft
+  static float t_air; // Temperature of surrounding air (in celsius)
+  static const float area_ref = 2.356; // Reference area for drag equation [m^2]
+  static float d_shutter_act; // Position of shutter actuator semi-halves
+  static float c_drag_req; // Requested drag coefficient
+}
+
+// Linear interpolation
+// It is assumed that x2 > x > x1
+float interp( float x1, float x2, float y1, float y2, float x )
+{
+  return ((y2-y1)/(x2-x1))*(x-x1)+y1;
+}
+
+// Calculation of acceleration due to drag
+//
+// The drag force is determined using the equation
+// F=0.5*rho*u^2*area_ref*c_drag
+//
+// The resultant force is equivalent to F=m*a
+float Model::calcDragAccel( float rho, float u, float c_drag )
+{
+  return (0.5*rho*u^2*area_ref*c_drag)/m;
+}
+
+float Model::calcDragCoeff( float rho, float u, float a)
+{
+  return (m*a)/(0.5*rho*u^2*area_ref);
+}
+
+// Update surrounding atmospheric values and execute functionalities
+void Model::update()
+{
+  // Update with new values for start of time step
+  totTime+=dt;
+  getAtm();
+
+  // Calculate new target values
+  calcReq();
+
+  // Command to change geometry
+  updateGeom();
+
+  // Calculate values for next time iteration
+  calcNextIter();
+}
+
+// Get atmospheric values and update atmospheric variables for this time iteration
+void Model::getAtm()
+{
+  getU(u);
+  t_air = getTemp();
+  rho = lookUp(temp, *density);
+}
+
+// Calculations of requested variables
+void Model::calcReq()
+{
+  static const float t_vel_change = 1.0; // Time spent for velocity to change
+
+  for( int i=0; i<3; i++ )
+  {
+    if( req_vel_cntr_prev > req_vel_cntr )
+    {
+      u_sc_req[i] = user_input_vel[i];
+    }
+
+    a_sc_req[i] = (u_sc_req[i] - u_sc_cur[i]) / t_vel_change;
+
+    if( 0 == i) // Drag forces
+    {
+      c_drag_req[i] = calcDragCoeff(rho, u_sc_cur[i], a_sc_cur[i]);
+
+    }
+  }
+}
+
+// Determines the geometry in next time iteration
+void Model::updateGeom()
+{
+  static const float r_shutter_act = 2.0;   // Rate of speed shutter opens/closes [m/s]
+
+  for( int i=0; i<3; i++ )
+  {
+    if (0 == i)
+    {
+      d_shutter_act += 
+    }
+  }
+}
+
+// Calculations for next iteration
+void calcNextIter()
+{
+  for( int i=0; i<3; i++ )
+  {
+    u_sc_cur[i] += a_sc_cur[i] * dt;
+    c_drag_cur[i] = calcDragCoeff(rho, u_sc_cur, )
+  }
+}
