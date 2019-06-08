@@ -1,7 +1,7 @@
-# saturnWheel
-pHacktory - Project Saturn Wheel
-
+# pHacktory - Saturn Wheel
 Here lies the files for the 3D model, flow simulation, and arduino coding.
+
+Click [here](https://github.com/pdoan017/saturnWheel/wiki) or navigate to the wiki for more detailed information.
 ## Hardware and Software
 Listed below are all the hardware and software used for this project.
 * Hardware
